@@ -4,9 +4,15 @@ library(dplyr)
 library(hdf5r)
 library(xlsx)
 
-immune.combined<- readRDS("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/immunecombined_rna.rds")
 
-#Find markers/conserved markers for each Clusters
+immune.combined<- readRDS("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/withoutMT_immunecombined_rna.rds")
+
+# Cluster Tree
+pbmc33k <- BuildClusterTree(object=immune.combined, slot = "scale.data",dims=1:20)
+PlotClusterTree(pbmc33k)
+
+
+# Find markers/conserved markers for each Clusters
 markers.0 <- FindConservedMarkers(immune.combined, ident.1 = 0, grouping.var = "stim", verbose = FALSE)
 head(markers.0)
 markers.1 <- FindConservedMarkers(immune.combined, ident.1 = 1, grouping.var = "stim", verbose = FALSE)
@@ -50,28 +56,7 @@ head(markers.19)
 markers.20 <- FindConservedMarkers(immune.combined, ident.1 = 20, grouping.var = "stim", verbose = FALSE)
 head(markers.20)
 
-#Cluster Tree
-pbmc33k <- BuildClusterTree(object=immune.combined, slot = "scale.data",dims=1:20)
-PlotClusterTree(pbmc33k)
-
-#We can explore these marker genes for each cluster and use them to annotate our clusters as specific cell types.
-FeaturePlot(immune.combined, features = c("CD3D", "SELL", "CREM", "CD8A", "GNLY", "CD79A", "FCGR3A", 
-                                          "CCL2", "PPBP"), min.cutoff = "q9")
-
-#Feature plots
-FeaturePlot(immune.combined, features = c("CD3D", "SELL", "CREM", "CD8A", "GNLY", "CD79A", "FCGR3A", 
-                                          "CCL2", "PPBP"), min.cutoff = "q9")
-FeaturePlot(immune.combined, features = c("IL7R", "CD4", "CD14", "LYZ", "MS4A1","MS4A7", "NKG7", "FCER1A", "CST3"), min.cutoff = "q9")
-FeaturePlot(immune.combined, features = c("CLEC7A",  "CLEC4C", "NRP2", "IL3RA","CD1C", "S100A4"), min.cutoff = "q9")
-
-
-#vln plots
-#general
-VlnPlot(object = immune.combined, features = c("CD3D",  "IL7R", "CD4", "SELL", "CREM", "CD14", "LYZ", "MS4A1", "FCGR3A", "MS4A7",  
-                                               "NKG7", "FCER1A", "CST3", "CLEC7A",  "CX3CR1", "CLEC4C", "NRP2", "IL3RA", 
-                                               "CD1C", "CD8A", "CD8B", "GNLY", "CD79A","PPBP"))
-
-#CD 4 T Cells
+#CD 4 T Cells => CLUSTER 1;2
 VlnPlot(object = immune.combined, features= c("IL7R", "CD40LG", "CD4", "LTA", "IFNG", "CD40",
                                               "LCK", "ITK", "LRRN3", "RRM2", "KIAA0101", "CST7",
                                               "IL2RB", "CD96", "CDCA7", "PTPRC"))
@@ -79,7 +64,7 @@ VlnPlot(object = immune.combined, features= c("IL7R", "CD40LG", "CD4", "LTA", "I
 #MK
 VlnPlot(object = immune.combined, features = c("PPBP", "PF4", "FLI1", "MYH9"))
 
-#NK Cells? - ImmGen report + YN lyons et al 
+#NK Cells? - ImmGen report + YN lyons et al  => CLUSTER 4
 VlnPlot(object = immune.combined, features= c("GNLY", "NKG7","PRF1", "CD8B", "PRF1", "CD8B", "GZMH", 
                                               "FCGR3A", "KLRB1", "GZMA","GZMB", "KLRC1", "TBX21"))
 
@@ -125,43 +110,11 @@ VlnPlot(object= immune.combined, features.plot = c("FCER1A", "CST3", "CLEC7A",  
                                                    "CD1C"))
 
 
-i.c <- RenameIdents(immune.combined, `0` = "CD14+ Mono", `1` = "CD4 Naive T", `2` = "CD4 Memory T", 
-                    `3` = "CD8+ T", `4` = "CD16+ Mono", `5` = "Natural killer", `6` = "CD8+ T", `7` = "CD14+ Mono", `8` = "CD8+ T", `9` = "B", 
-                    `10` = "CD14+ Mono", `11` = "Dendritic", `12` = "Megakaryocyte", `13` = "Megakaryocyte", `14`="CD4+ T/ CD8+ T", 
-                    `15`="Megakaryocyte",`16`="B cell subtype", `17`="MT", `18`="Natural killer", `19`="Megakaryocyte", `20`="B cell subtype")
 
+i.c <- RenameIdents(immune.combined, `0` = "CD14+ Monocytes", `1` = "CD4+ T", `2` = "CD4+ T", 
+                    `3` = "CD8+ T", `4` = "NK", `5` = "CD8+ T", `6` = "CD16+ Monocytes", `7` = "CD14+ Monocytes", `8` = "B", `9` = "Dendritic", 
+                    `10` = "NK", `11` = "CD14+ Monocytes", `12` = "Megakaryocyte", `13` = "B", `14`="Dendritic", 
+                    `15`="NK",`16`="B", `17`="B")
 DimPlot(i.c, label = TRUE)
-
-
-#Analysing specific genes to check their expression level in monocytes
-FeaturePlot(i.c, features = c("NLRP3", "PYCARD", "CASP1","GSDMD","IL1B"), split.by = "stim", max.cutoff = 3, 
-            cols = c("grey", "red"))
-
-
-#Showing violin plots for the following markers to show their impact on Monocytes cell 
-#in comparison to other cells
-plots <- VlnPlot(i.c, features = c("NLRP3", "PYCARD", "CASP1","GSDMD","IL1B"), split.by = "stim", group.by = "celltype", 
-                 pt.size = 0, combine = FALSE)
-CombinePlots(plots = plots, ncol = 1)
-
-VlnPlot(i.c, features = "NLRP3", split.by = "stim", group.by = "celltype", 
-        pt.size = 0, combine = T)
-VlnPlot(i.c, features = "NLRP3", split.by = "stim", group.by = "celltype")
-
-VlnPlot(i.c, features = "PYCARD", split.by = "stim", group.by = "celltype", 
-        pt.size = 0, combine = FALSE)
-VlnPlot(i.c, features = "PYCARD", split.by = "stim", group.by = "celltype")
-
-VlnPlot(i.c, features = "CASP1", split.by = "stim", group.by = "celltype", 
-        pt.size = 0, combine = TRUE)
-VlnPlot(i.c, features = "CASP1", split.by = "stim", group.by = "celltype")
-
-VlnPlot(i.c, features = "GSDMD", split.by = "stim", group.by = "celltype", 
-        pt.size = 0, combine = FALSE)
-VlnPlot(i.c, features = "GSDMD", split.by = "stim", group.by = "celltype")
-
-VlnPlot(i.c, features = "IL1B", split.by = "stim", group.by = "celltype", 
-        pt.size = 0, combine = FALSE)
-VlnPlot(i.c, features = "IL1B", split.by = "stim", group.by = "celltype")
 
 

@@ -2,18 +2,25 @@ library(Seurat)
 library(cowplot)
 library(dplyr)
 library(hdf5r)
-library(xlsx)
+#library(xlsx)
+
+
 #### Merging PD ####
-pd_1.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/pd/115/filtered_feature_bc_matrix.h5")
+pd_1.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/pd/115/filtered_feature_bc_matrix.h5")
 pd_1 <- CreateSeuratObject(counts = pd_1.data, project = "PD_1", min.cells = 5)
-pd_2.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/pd/117/filtered_feature_bc_matrix.h5")
+pd_1[["percent.mt"]] <- PercentageFeatureSet(pd_1, pattern = "^MT-")
+pd_2.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/pd/117/filtered_feature_bc_matrix.h5")
 pd_2 <- CreateSeuratObject(counts = pd_2.data, project = "PD_2", min.cells = 5)
-pd_3.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/pd/123/filtered_feature_bc_matrix.h5")
+pd_2[["percent.mt"]] <- PercentageFeatureSet(pd_2, pattern = "^MT-")
+pd_3.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/pd/123/filtered_feature_bc_matrix.h5")
 pd_3 <- CreateSeuratObject(counts = pd_3.data, project = "PD_3", min.cells = 5)
-pd_4.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/pd/126/filtered_feature_bc_matrix.h5")
+pd_3[["percent.mt"]] <- PercentageFeatureSet(pd_3, pattern = "^MT-")
+pd_4.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/pd/126/filtered_feature_bc_matrix.h5")
 pd_4 <- CreateSeuratObject(counts = pd_4.data, project = "PD_4", min.cells = 5)
-pd_5.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/pd/134/filtered_feature_bc_matrix.h5")
+pd_4[["percent.mt"]] <- PercentageFeatureSet(pd_4, pattern = "^MT-")
+pd_5.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/pd/134/filtered_feature_bc_matrix.h5")
 pd_5 <- CreateSeuratObject(counts = pd_5.data, project = "PD_5", min.cells = 5)
+pd_5[["percent.mt"]] <- PercentageFeatureSet(pd_5, pattern = "^MT-")
 
 ##Merging 2 seurat objects
 pd.combined12 <- merge(pd_1,y=pd_2, add.cell.ids = c("PD1", "PD2"), project = "PD12")
@@ -22,16 +29,21 @@ pd.combined1234 <- merge(pd.combined123,y=pd_4, add.cell.ids = c("PD123", "PD4")
 pd.combined12345 <- merge(pd.combined1234,y=pd_5, add.cell.ids = c("PD1234", "PD5"), project = "PD12345")
 
 #### Merging Control ####
-cn_1.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/control/116/filtered_feature_bc_matrix.h5")
+cn_1.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/control/116/filtered_feature_bc_matrix.h5")
 cn_1 <- CreateSeuratObject(counts = cn_1.data, project = "CN_1", min.cells = 5)
-cn_2.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/control/124/filtered_feature_bc_matrix.h5")
+cn_1[["percent.mt"]] <- PercentageFeatureSet(cn_1, pattern = "^MT-")
+cn_2.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/control/124/filtered_feature_bc_matrix.h5")
 cn_2 <- CreateSeuratObject(counts = cn_2.data, project = "CN_2", min.cells = 5)
-cn_3.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/control/125/filtered_feature_bc_matrix.h5")
+cn_2[["percent.mt"]] <- PercentageFeatureSet(cn_2, pattern = "^MT-")
+cn_3.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/control/125/filtered_feature_bc_matrix.h5")
 cn_3 <- CreateSeuratObject(counts = cn_3.data, project = "CN_3", min.cells = 5)
-cn_4.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/control/133/filtered_feature_bc_matrix.h5")
+cn_3[["percent.mt"]] <- PercentageFeatureSet(cn_3, pattern = "^MT-")
+cn_4.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/control/133/filtered_feature_bc_matrix.h5")
 cn_4 <- CreateSeuratObject(counts = cn_4.data, project = "CN_4", min.cells = 5)
-cn_5.data <- Read10X_h5("/Users/deepanshishokeen/desktop/QBS195/SingleCellData/control/135/filtered_feature_bc_matrix.h5")
+cn_4[["percent.mt"]] <- PercentageFeatureSet(cn_4, pattern = "^MT-")
+cn_5.data <- Read10X_h5("/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/control/135/filtered_feature_bc_matrix.h5")
 cn_5 <- CreateSeuratObject(counts = cn_5.data, project = "CN_5", min.cells = 5)
+cn_5[["percent.mt"]] <- PercentageFeatureSet(cn_5, pattern = "^MT-")
 
 ##Merging 2 seurat objects
 cn.combined12 <- merge(cn_1,y=cn_2, add.cell.ids = c("cn1", "cn2"), project = "cn12")
@@ -44,7 +56,11 @@ cn.combined12345 <- merge(cn.combined1234,y=cn_5, add.cell.ids = c("cn1234", "cn
 #ctrl <- CreateSeuratObject(counts = cn.combined12345, project = "IMMUNE_CTRL", min.cells = 5)
 ctrl <- cn.combined12345
 ctrl$stim <- "CTRL"
-ctrl <- subset(ctrl, subset = nFeature_RNA > 500)
+VlnPlot(ctrl, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+plot1 <- FeatureScatter(ctrl, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot2 <- FeatureScatter(ctrl, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+CombinePlots(plots = list(plot1, plot2))
+ctrl <- subset(ctrl, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
 ctrl <- NormalizeData(ctrl, verbose = FALSE)
 ctrl <- FindVariableFeatures(ctrl, selection.method = "vst", nfeatures = 2000)
 
@@ -52,7 +68,11 @@ ctrl <- FindVariableFeatures(ctrl, selection.method = "vst", nfeatures = 2000)
 #stim <- CreateSeuratObject(counts = stim.data, project = "IMMUNE_STIM", min.cells = 5)
 stim <- pd.combined12345
 stim$stim <- "STIM"
-stim <- subset(stim, subset = nFeature_RNA > 500)
+VlnPlot(stim, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+plot1 <- FeatureScatter(stim, feature1 = "nCount_RNA", feature2 = "percent.mt")
+plot2 <- FeatureScatter(stim, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+CombinePlots(plots = list(plot1, plot2))
+stim <- subset(stim, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
 stim <- NormalizeData(stim, verbose = FALSE)
 stim <- FindVariableFeatures(stim, selection.method = "vst", nfeatures = 2000)
 
@@ -82,10 +102,11 @@ plot_grid(p1, p2)
 
 DimPlot(immune.combined, reduction = "umap", split.by = "stim")
 
-#saveRDS(immune.combined, file = "/Users/deepanshishokeen/desktop/QBS195/SingleCellData/immunecombined_integrated.rds")
+saveRDS(immune.combined, file = "/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/withoutMT_immunecombined_integrated.rds")
 
-##indentify conserved cell types
+## Indentify conserved cell types
 DefaultAssay(immune.combined) <- "RNA"
 
-#Saving in RDS format to load object in effective way
-saveRDS(immune.combined, file = "/Users/deepanshishokeen/desktop/QBS195/SingleCellData/immunecombined_rna.rds")
+# Saving in RDS format to load object in effective way
+saveRDS(immune.combined, file = "/Users/deepanshishokeen/desktop/SingleCellRNASeq/SingleCellData/withoutMT_immunecombined_rna.rds")
+
